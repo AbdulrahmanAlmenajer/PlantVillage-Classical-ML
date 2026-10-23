@@ -45,6 +45,34 @@ class SoftVotingEnsemble:
         probs = self.predict_proba(X)
         return np.argmax(probs, axis=1)
 
+class HierarchicalPlantEngine:
+    def __init__(self, crop_router, crop_classes, crop_to_indices, crop_specialists, all_classes):
+        self.crop_router = crop_router
+        self.crop_classes = list(crop_classes)
+        self.crop_to_indices = crop_to_indices
+        self.crop_specialists = crop_specialists
+        self.classes_ = list(all_classes)
+        self.n_classes = len(all_classes)
+
+    def predict_proba(self, X):
+        n_samples = X.shape[0]
+        final_probs = np.zeros((n_samples, self.n_classes), dtype=np.float32)
+        crop_probs = self.crop_router.predict_proba(X)
+        for crop_idx, crop_name in enumerate(self.crop_classes):
+            target_indices = self.crop_to_indices[crop_name]
+            p_crop = crop_probs[:, crop_idx:crop_idx+1]
+            specialist = self.crop_specialists[crop_name]
+            if specialist is None:
+                final_probs[:, target_indices[0]] = p_crop.ravel()
+            else:
+                cond_probs = specialist.predict_proba(X)
+                final_probs[:, target_indices] = p_crop * cond_probs
+        return final_probs
+
+    def predict(self, X):
+        probs = self.predict_proba(X)
+        return np.argmax(probs, axis=1)
+
 # ========================================================
 # استخراج السمات المتقدمة المطابقة للنموذج الأكبر (554 ميزة)
 # ========================================================
@@ -110,12 +138,22 @@ def predict_leaf(image_path, model_type="grand_54k", threshold=0.50):
         print(f"[!] Error: Image not found at path: {image_path}")
         return None
 
-    # تحديد النموذج المناسب (الافتراضي هو نموذج الـ 54 ألف صورة الأكبر)
-    if model_type in ["grand", "grand_54k", "all", "54k"] and os.path.exists("saved_models/grand_54k_ensemble_model.pkl"):
+    # تحديد النموذج المناسب
+    if model_type in ["hierarchical", "hier", "fast"] and os.path.exists("saved_models/hierarchical_calibrated_engine.pkl"):
+        model_path = "saved_models/hierarchical_calibrated_engine.pkl"
+        scaler_path = "saved_models/grand_54k_scaler.pkl"
+        labels_path = "saved_models/grand_54k_labels.json"
+        engine_title = "Hierarchical Calibrated Engine (14 Crops | 38 Classes | Fast 17MB)"
+    elif model_type in ["grand", "grand_54k", "all", "54k"] and os.path.exists("saved_models/grand_54k_ensemble_model.pkl"):
         model_path = "saved_models/grand_54k_ensemble_model.pkl"
         scaler_path = "saved_models/grand_54k_scaler.pkl"
         labels_path = "saved_models/grand_54k_labels.json"
         engine_title = "PlantVillage Grand Master Ensemble (Full 54,305 Images | 38 Classes)"
+    elif os.path.exists("saved_models/hierarchical_calibrated_engine.pkl"):
+        model_path = "saved_models/hierarchical_calibrated_engine.pkl"
+        scaler_path = "saved_models/grand_54k_scaler.pkl"
+        labels_path = "saved_models/grand_54k_labels.json"
+        engine_title = "Hierarchical Calibrated Engine (14 Crops | 38 Classes | Fast 17MB)"
     elif os.path.exists("saved_models/ultimate_ensemble_model.pkl"):
         model_path = "saved_models/ultimate_ensemble_model.pkl"
         scaler_path = "saved_models/ultimate_scaler.pkl"
@@ -209,7 +247,7 @@ def predict_leaf(image_path, model_type="grand_54k", threshold=0.50):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Plant Disease Diagnosis using Grand Master ML Pipeline")
     parser.add_argument("image_path", nargs="?", default="images.jfif", help="Path to input leaf image")
-    parser.add_argument("--model", choices=["grand", "grand_54k", "all", "ultimate", "ensemble", "tomato"], default="grand", help="Model type to use")
+    parser.add_argument("--model", choices=["hierarchical", "fast", "hier", "grand", "grand_54k", "all", "ultimate", "ensemble", "tomato"], default="hierarchical", help="Model type to use")
     parser.add_argument("--threshold", type=float, default=0.50, help="Confidence threshold (0.0 to 1.0)")
     args = parser.parse_args()
 

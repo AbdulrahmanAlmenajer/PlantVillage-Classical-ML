@@ -1,0 +1,147 @@
+{
+  "global_metrics": {
+    "test_accuracy": 98.05,
+    "balanced_accuracy": 97.05,
+    "macro_precision": 97.51,
+    "macro_recall": 97.05,
+    "macro_f1": 97.26,
+    "weighted_f1": 98.05,
+    "top1_accuracy": 98.05,
+    "top2_accuracy": 99.47,
+    "top3_accuracy": 99.75,
+    "top5_accuracy": 99.9,
+    "log_loss": 0.3013,
+    "brier_score": 0.0922,
+    "ece_percentage": 20.7,
+    "total_test_samples": 8146,
+    "total_errors": 159,
+    "intra_crop_errors": 50,
+    "inter_crop_errors": 109
+  },
+  "worst_recall_classes": [
+    {
+      "Class": "Potato___healthy",
+      "Support": 23,
+      "Precision": 86.95652173913044,
+      "Recall": 86.95652173913044,
+      "F1": 86.95652173913044
+    },
+    {
+      "Class": "Corn_(maize)___Cercospora_leaf_spot Gray_leaf_spot",
+      "Support": 77,
+      "Precision": 89.6103896103896,
+      "Recall": 89.6103896103896,
+      "F1": 89.6103896103896
+    },
+    {
+      "Class": "Apple___Cedar_apple_rust",
+      "Support": 41,
+      "Precision": 100.0,
+      "Recall": 90.2439024390244,
+      "F1": 94.87179487179486
+    },
+    {
+      "Class": "Potato___Late_blight",
+      "Support": 150,
+      "Precision": 96.52777777777779,
+      "Recall": 92.66666666666666,
+      "F1": 94.5578231292517
+    },
+    {
+      "Class": "Apple___Black_rot",
+      "Support": 93,
+      "Precision": 100.0,
+      "Recall": 93.54838709677419,
+      "F1": 96.66666666666667
+    }
+  ],
+  "worst_precision_classes": [
+    {
+      "Class": "Potato___healthy",
+      "Support": 23,
+      "Precision": 86.95652173913044,
+      "Recall": 86.95652173913044,
+      "F1": 86.95652173913044
+    },
+    {
+      "Class": "Corn_(maize)___Cercospora_leaf_spot Gray_leaf_spot",
+      "Support": 77,
+      "Precision": 89.6103896103896,
+      "Recall": 89.6103896103896,
+      "F1": 89.6103896103896
+    },
+    {
+      "Class": "Corn_(maize)___Northern_Leaf_Blight",
+      "Support": 147,
+      "Precision": 93.91891891891892,
+      "Recall": 94.5578231292517,
+      "F1": 94.23728813559322
+    },
+    {
+      "Class": "Tomato___Septoria_leaf_spot",
+      "Support": 265,
+      "Precision": 94.48529411764706,
+      "Recall": 96.98113207547169,
+      "F1": 95.7169459962756
+    },
+    {
+      "Class": "Tomato___Spider_mites Two-spotted_spider_mite",
+      "Support": 252,
+      "Precision": 95.43726235741445,
+      "Recall": 99.60317460317461,
+      "F1": 97.47572815533981
+    }
+  ],
+  "top_confusions": [
+    {
+      "true": "Corn_(maize)___Northern_Leaf_Blight",
+      "pred": "Corn_(maize)___Cercospora_leaf_spot Gray_leaf_spot",
+      "count": 8
+    },
+    {
+      "true": "Tomato___Target_Spot",
+      "pred": "Tomato___Spider_mites Two-spotted_spider_mite",
+      "count": 7
+    },
+    {
+      "true": "Corn_(maize)___Cercospora_leaf_spot Gray_leaf_spot",
+      "pred": "Corn_(maize)___Northern_Leaf_Blight",
+      "count": 7
+    },
+    {
+      "true": "Grape___Esca_(Black_Measles)",
+      "pred": "Grape___Black_rot",
+      "count": 5
+    },
+    {
+      "true": "Apple___healthy",
+      "pred": "Blueberry___healthy",
+      "count": 5
+    },
+    {
+      "true": "Potato___Late_blight",
+      "pred": "Tomato___Septoria_leaf_spot",
+      "count": 4
+    },
+    {
+      "true": "Tomato___Septoria_leaf_spot",
+      "pred": "Potato___Early_blight",
+      "count": 3
+    },
+    {
+      "true": "Strawberry___Leaf_scorch",
+      "pred": "Tomato___Septoria_leaf_spot",
+      "count": 3
+    },
+    {
+      "true": "Blueberry___healthy",
+      "pred": "Tomato___Septoria_leaf_spot",
+      "count": 3
+    },
+    {
+      "true": "Pepper,_bell___healthy",
+      "pred": "Soybean___healthy",
+      "count": 3
+    }
+  ]
+}

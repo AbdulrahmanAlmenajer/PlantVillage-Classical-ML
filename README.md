@@ -90,12 +90,18 @@ All models were evaluated using a strict **Stratified 70% Train (38,013) / 15% V
 
 ### Comparative Model Benchmark (38 Classes | 54,305 Images)
 
-| Model Architecture | Hyperparameters / Details | Val Accuracy | Test Accuracy | Macro F1-Score | Inference Time / Sample |
-| :--- | :--- | :---: | :---: | :---: | :---: |
-| **Dummy Baseline** | Stratified Majority Class | 10.14% | 10.14% | 0.0263 | < 0.1 ms |
-| **Random Forest** | 100 Trees, `balanced` weights, `n_jobs=-1` | 95.73% | 95.65% | 0.9571 | 2.1 ms |
-| **LightGBM** | 150 Iterations, `colsample_bytree=0.8`, `subsample=0.8` | 97.90% | 97.86% | 0.9788 | 1.4 ms |
-| **Grand Master Ensemble** | **Soft-Voting (0.65 LightGBM + 0.35 RF)** | **98.11%** | **98.05%** | **98.07%** | **3.5 ms** |
+| Model Architecture | Hyperparameters / Details | Val Accuracy | Test Accuracy | Macro F1-Score | ECE (Calibration) | Model Size | Latency / Leaf |
+| :--- | :--- | :---: | :---: | :---: | :---: | :---: | :---: |
+| **Dummy Baseline** | Stratified Majority Class | 10.14% | 10.14% | 0.0263 | - | - | < 0.1 ms |
+| **Random Forest** | 100 Trees, `balanced` weights, `n_jobs=-1` | 95.73% | 95.65% | 0.9571 | 14.8% | 850 MB | 2.1 ms |
+| **LightGBM** | 150 Iterations, `colsample_bytree=0.8` | 97.90% | 97.86% | 0.9788 | 11.2% | 120 MB | 1.4 ms |
+| **Grand Master Ensemble** | **Soft-Voting (0.65 LGBM + 0.35 RF)** | **98.11%** | **98.05%** | **98.07%** | **0.34% (Calibrated)** | 1.44 GB | 3.1 ms |
+| **Hierarchical Engine** | **2-Stage (Crop Router + 14 Specialists)** | **97.62%** | **97.48%** | **96.40%** | **4.59% (Calibrated)** | **17.2 MB** | **0.54 ms** |
+
+> [!TIP]
+> **Architectural Trade-Off Selection:**
+> - **Maximum Accuracy Mode:** Use **Grand Master Ensemble** (98.05% Test Acc, Top-3 99.75%, calibrated ECE 0.34%).
+> - **Edge / IoT Deployment Mode:** Use **Hierarchical Engine** (17.2 MB file size, 0.54 ms CPU inference, directly packaged in repository for immediate deployment).
 
 ---
 
@@ -129,6 +135,9 @@ $$\hat{y} = \begin{cases} \arg\max_k P(Y=k \mid X), & \text{if } \max_k P(Y=k \m
 <div align="center">
   <img src="grand_54k_confusion_matrix.png" width="850" alt="Grand 54K Confusion Matrix" />
   <p><em>Figure 2: Multi-class Confusion Matrix across all 38 classes on 8,146 unseen test samples.</em></p>
+  <br/>
+  <img src="calibration_and_diagnostics.png" width="850" alt="Calibration Reliability Diagram and Top-K Progression" />
+  <p><em>Figure 3: Reliability Calibration Diagram and Top-K progression (Top-3 Accuracy reaches 99.77%).</em></p>
 </div>
 
 ---
@@ -136,31 +145,34 @@ $$\hat{y} = \begin{cases} \arg\max_k P(Y=k \mid X), & \text{if } \max_k P(Y=k \m
 ## 📁 Repository Structure
 
 ```text
-├── .gitignore                      # Configured for GitHub 100MB file limit & caches
-├── requirements.txt                # Pinned production dependencies
-├── README.md                       # Comprehensive project documentation
+├── .gitignore                          # Configured for GitHub 100MB file limit & caches
+├── requirements.txt                    # Pinned production dependencies
+├── README.md                           # Comprehensive project documentation
 │
-├── predict_leaf.py                 # Production CLI inference & diagnostic report engine
-├── train_grand_master_54k.py       # Master training pipeline (Full 54,305 dataset)
-├── train_ultimate_system.py        # Balanced fast-prototyping benchmark (5,700 samples)
-├── train_ensemble_pipeline.py      # Crop-specific (Tomato 10-class) benchmark
+├── predict_leaf.py                     # Production CLI inference & diagnostic report engine
+├── deep_diagnostic_suite.py            # Comprehensive multi-metric audit & error analysis
+├── train_hierarchical_calibrated_pipeline.py # 2-Stage Hierarchical & Calibrated training engine
+├── train_grand_master_54k.py           # Flagship master training pipeline (Full 54,305 dataset)
+├── train_ultimate_system.py            # Balanced fast-prototyping benchmark (5,700 samples)
+├── train_ensemble_pipeline.py          # Crop-specific (Tomato 10-class) benchmark
 │
-├── saved_models/                   # Model artifacts & metadata
-│   ├── best_tomato_model.pkl       # Lightweight deployed model (2.2 MB)
-│   ├── ensemble_model.pkl          # Tomato 4-model ensemble (15.9 MB)
-│   ├── all_plants_model.pkl        # Multi-crop baseline model (11.3 MB)
-│   ├── grand_54k_scaler.pkl        # Scaler for full 54K pipeline (13.8 KB)
-│   ├── grand_54k_labels.json       # 38-class diagnostic label mapping
-│   └── ...                         # (Large 1.44GB weights excluded via .gitignore)
+├── saved_models/                       # Model artifacts & metadata
+│   ├── hierarchical_calibrated_engine.pkl # 2-Stage Engine (17.2 MB - Pre-packaged in Git)
+│   ├── best_tomato_model.pkl           # Lightweight deployed model (2.2 MB)
+│   ├── ensemble_model.pkl              # Tomato 4-model ensemble (15.9 MB)
+│   ├── all_plants_model.pkl            # Multi-crop baseline model (11.3 MB)
+│   ├── grand_54k_scaler.pkl            # Production StandardScaler (13.8 KB)
+│   ├── grand_54k_labels.json           # 38-class diagnostic label mapping
+│   └── ...                             # (Large 1.44GB flat ensemble excluded via .gitignore)
 │
-├── test_samples/                   # Standard test images for instant evaluation
-│   └── sample_corn_leaf.jfif       # Sample infected corn leaf
+├── test_samples/                       # Standard test images for instant evaluation
+│   └── sample_corn_leaf.jfif           # Sample infected corn leaf
 │
-└── *.png                           # High-resolution benchmark evaluation curves
+└── *.png                               # High-resolution benchmark evaluation curves
 ```
 
 > [!NOTE]
-> Large binary model files (`grand_54k_ensemble_model.pkl` at 1.44 GB and `ultimate_ensemble_model.pkl` at 300 MB) exceed GitHub's 100 MB file limit and are safely ignored by `.gitignore`. You can regenerate them locally in minutes using `python train_grand_master_54k.py`, or use the pre-packaged lightweight models included in `saved_models/`.
+> The **Hierarchical Calibrated Engine (`hierarchical_calibrated_engine.pkl`)** is only **17.2 MB** and is **included directly in this repository**! You can clone the repo and immediately run diagnoses on leaves without having to download multi-gigabyte models or retrain from scratch. For researchers wanting the 1.44 GB Flat Grand Ensemble, simply run `python train_grand_master_54k.py`.
 
 ---
 

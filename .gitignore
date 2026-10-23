@@ -1,0 +1,59 @@
+# ========================================================
+# Git Ignore for Plant Disease Classification (ML Project)
+# ========================================================
+
+# 1. البيئة الافتراضية وحزم بايثون (Virtual Environments & Python caches)
+.venv/
+venv/
+env/
+ENV/
+__pycache__/
+*.py[cod]
+*$py.class
+*.pyd
+
+# 2. البيانات الخام الضخمة (Dataset Directories > 50,000 images)
+# ملاحظة: يتم تحميل البيانات من مصدر PlantVillage الرسمي
+raw/
+color/
+segmented/
+grayscale/
+
+# 3. ملفات الكاش والسمات الضخمة (Feature Caches > 100MB)
+*.npz
+*.tmp
+*.cache
+*.checkpoint
+master_54k_features.npz
+grand_54k_features_cache.npz
+all_plants_features_cache.npz
+ultimate_features_cache.npz
+features_cache.npz
+*.npz.tmp*
+
+# 4. النماذج الضخمة التي تتجاوز حد جيت هب (100MB Large Model Binaries)
+# ملاحظة: جيت هب يرفض أي ملف أكبر من 100 ميغابايت
+saved_models/grand_54k_ensemble_model.pkl
+saved_models/ultimate_ensemble_model.pkl
+saved_models/all_plants_ensemble_model.pkl
+rigorous_models/
+
+# السماح بالنماذج الخفيفة والملفات التعريفية (JSON & Scalers)
+!saved_models/*.json
+!saved_models/*.pkl.gitkeep
+
+# 5. بيئات التطوير وأنظمة التشغيل (IDEs & OS Files)
+.vscode/
+.idea/
+*.sublime-workspace
+.DS_Store
+Thumbs.db
+desktop.ini
+*.log
+
+# 6. الصور التجريبية الشخصية
+images (1).jfif
+images.jfif
+download.webp
+download.jfif
+test_*.py

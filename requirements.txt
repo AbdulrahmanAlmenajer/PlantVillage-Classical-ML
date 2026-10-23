@@ -1,0 +1,23 @@
+# ==============================================================================
+# PlantVillage Classical ML Disease Diagnosis Engine
+# Requirements & Dependencies
+# ==============================================================================
+
+# Core Numerical & Data Structures
+numpy>=1.24.0
+pandas>=2.0.0
+scipy>=1.10.0
+
+# Computer Vision & Handcrafted Feature Engineering (CLAHE, GLCM, LBP, Hu, Color)
+opencv-python-headless>=4.8.0
+scikit-image>=0.20.0
+
+# Machine Learning Algorithms & Ensembling (GBDT, RF, Decision Gates)
+scikit-learn>=1.3.0
+lightgbm>=4.0.0
+xgboost>=2.0.0
+joblib>=1.3.0
+
+# Visualization, Confusion Matrices & Confidence Curves
+matplotlib>=3.7.0
+seaborn>=0.12.0

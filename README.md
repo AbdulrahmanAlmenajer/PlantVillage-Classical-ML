@@ -288,3 +288,4 @@ This will automatically:
 - **License:** MIT License. Free for academic, research, and commercial use.
 - **Dataset:** Mohanty et al., *Using Deep Learning for Image-Based Plant Disease Detection*, Frontiers in Plant Science (PlantVillage Dataset).
 - **Author:** Eng. Abdulrahman.
+
